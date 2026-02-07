@@ -61,3 +61,17 @@ datafeeds/
 
 # Lock files
 *.lock
+
+# Prisma (add this whole block)
+prisma/migrations/
+prisma/generated/
+# or: prisma/output/
+
+# Environment (expand existing .env)
+.env*.local
+
+# Lock files (explicit)
+package-lock.json
+
+# AI/Agent files
+Rules.md

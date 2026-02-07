@@ -4,8 +4,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  schemas   = ["public"]
+  provider = "postgresql"
+  schemas  = ["public"]
 }
 
 model Trade {
@@ -69,13 +69,13 @@ model BusinessSubscription {
   plan        String
   createdAt   DateTime  @default(now())
   userId      String    @unique
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  business    Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
   businessId  String    @unique
   endDate     DateTime?
   status      String    @default("ACTIVE")
   trialEndsAt DateTime?
   interval    String?
+  business    Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([email])
   @@index([userId])
@@ -89,13 +89,13 @@ model TeamSubscription {
   plan        String
   createdAt   DateTime  @default(now())
   userId      String    @unique
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  team        Team      @relation(fields: [teamId], references: [id], onDelete: Cascade)
   teamId      String    @unique
   endDate     DateTime?
   status      String    @default("ACTIVE")
   trialEndsAt DateTime?
   interval    String?
+  team        Team      @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([email])
   @@index([userId])
@@ -117,18 +117,17 @@ model Notification {
 }
 
 model User {
-  id                    String                 @id @default(cuid())
-  email                 String                 @unique
-  auth_user_id          String                 @unique
-  isFirstConnection     Boolean                @default(true)
+  id                    String                @id @default(cuid())
+  email                 String                @unique
+  auth_user_id          String                @unique
+  isFirstConnection     Boolean               @default(true)
   etpToken              String?
-  isBeta                Boolean                @default(false)
-  language              String                 @default("en")
+  isBeta                Boolean               @default(false)
+  language              String                @default("en")
   thorToken             String?
   accounts              Account[]
   businesses            Business[]
-  teams                 Team[]
-  teamSubscriptions     TeamSubscription[]
+  businessSubscriptions BusinessSubscription?
   comments              Comment[]
   dashboardLayout       DashboardLayout?
   groups                Group[]
@@ -136,12 +135,13 @@ model User {
   notifications         Notification[]
   orders                Order[]
   posts                 Post[]
+  referral              Referral?
   subscriptions         Subscription?
   synchronizations      Synchronization[]
   tags                  Tag[]
+  teams                 Team[]
+  teamSubscriptions     TeamSubscription?
   votes                 Vote[]
-  businessSubscriptions BusinessSubscription[]
-  referral              Referral?
 
   @@index([email])
   @@schema("public")
@@ -323,12 +323,12 @@ model Account {
   promoType                       PromoType?
   renewalNotice                   Int?
   minPnlToCountAsDay              Float?
-  group                           Group?            @relation(fields: [groupId], references: [id])
-  user                            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  payouts                         Payout[]
   buffer                          Float             @default(0)
   considerBuffer                  Boolean           @default(true)
   shouldConsiderTradesBeforeReset Boolean           @default(true)
+  group                           Group?            @relation(fields: [groupId], references: [id])
+  user                            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payouts                         Payout[]
 
   @@unique([number, userId])
   @@index([number])
